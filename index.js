@@ -1,16 +1,25 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer } = require('apollo-server');
 
-const typeDefs = gql`
-	type Book {
-		title: String
-		author: String
-	}
+const mongoose = require('mongoose');
+const { MONGODB } = require('./config');
 
-	type Query {
-		books: [Book]
-	}
-`;
+const typeDefs = require('./graphql/typeDefs');
+const resolvers = require('./graphql/resolvers');
 
-const resolvers = {
-	Query,
-};
+const server = new ApolloServer({
+	typeDefs,
+	resolvers,
+});
+
+mongoose
+	.connect(MONGODB, { useNewUrlParser: true, useUnifiedTopology: true })
+	.then(() => {
+		console.log('MongoDB connected!');
+		return server.listen({ port: 5000 });
+	})
+	.then((res) => {
+		console.log(`🚀  Server ready at ${res.url}`);
+	})
+	.catch((err) => {
+		console.log(err);
+	});
