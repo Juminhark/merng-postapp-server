@@ -2,12 +2,20 @@
 
 ## Reference
 
-- [Classsed - GraphQL Server Series(MERNG)](https://www.youtube.com/playlist?list=PLMhAeHCz8S3_pgb-j51QnCEhXNj5oyl8n)
+- [Classsed - GraphQL Server Series(MERNG)](https://www.youtube.com/watch?v=YBydg_Ui02Q&list=PLMhAeHCz8S3_CTiWMQhL6YxX7vZ7z84Zo)
 
-## Dependence
+- [Classsed - React GraphQL App series(MERNG)](https://www.youtube.com/playlist?list=PLMhAeHCz8S3_pgb-j51QnCEhXNj5oyl8n)
+
+## Stack && Dependencies
 
 - [MongoDB](https://www.mongodb.com/cloud/atlas)
+  - [mongoose](https://github.com/Automattic/mongoose)
 - [Apollo-GraphQL](https://www.apollographql.com/docs/tutorial/introduction/)
+  - [apollo-server](https://www.apollographql.com/docs/apollo-server/)
+  - [graphql](https://graphql.org/)
+- [node express jwt Authenticatoin](https://www.techiediaries.com/node-express-jwt-authentication/)
+  - [bcryptjs](https://github.com/dcodeIO/bcrypt.js)
+  - [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken)
 
 ## Init
 
@@ -107,7 +115,9 @@ server.listen().then(({ url }) => {
 module.exports = {
 	MONGODB: 'mongodb connect code',
 };
+```
 
+```js
 // index.js
 const mongoose = require('mongoose');
 const { MONGODB } = require('./config');
@@ -214,8 +224,131 @@ const resolvers = {
 
 ## token
 
+- install
+
 ```
 > yarn add bcryptjs jsonwebtoken
 ```
+
+- create token
+
+```js
+// graphql/resolvers/users.js
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { SECRET_KEY } = require('../../config');
+
+const generateToken = (user) => {
+	return jwt.sign(
+		{
+			id: user.id,
+			email: user.email,
+			username: user.username,
+		},
+		SECRET_KEY,
+		{ expiresIn: '1h' } // 1시간 유지
+	);
+};
+
+module.exports = {
+	Mutation: {
+		async register(
+			_,
+			{ registerInput: { username, email, password, confirmPassword } }
+		) {
+			//  TODO:  USER 비밀번호 hash화
+			password = await bcrypt.hash(password, 12);
+
+			const newUser = new User({
+				email,
+				username,
+				password,
+				createdAt: new Date().toISOString(),
+			});
+
+			// TODO: DB 저장후, TOKEN생성을 위한 USER정보
+			const userInfo = await newUser.save();
+
+			// TODO: JWT에 USER정보를 넣어 TOKEN 생성
+			const token = generateToken(userInfo);
+
+			return {
+				userInfo,
+				token,
+			};
+		},
+	},
+};
+```
+
+## validate
+
+```js
+// util/validators.js
+module.exports.validateRegisterInput = (
+	username,
+	email,
+	password,
+	confirmPassword
+) => {
+	const errors = {};
+
+	console.log('dd');
+
+	// TODO : validate username
+	if (username.trim() === '') {
+		errors.username = 'Username must not be empty';
+	}
+
+	// TODO : validate email
+	if (email.trim() === '') {
+		errors.email = 'Email must not be empty';
+	} else {
+		const regEx = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+		//? : / / 안에 있는 내용은 정규표현식 검증에 사용되는 패턴이 이 안에 위치함
+		//? : / /i 정규표현식에 사용된 패턴이 대소문자를 구분하지 않도록 i를 사용함
+		//? : ^ 표시는 처음시작하는 부분부터 일치한다는 표시임
+		//? : [0-9a-zA-Z] 하나의 문자가 []안에 위치한 규칙을 따른다는 것으로 숫자와 알파벳 소문지 대문자인 경우를 뜻 함
+		//? : * 이 기호는 0또는 그 이상의 문자가 연속될 수 있음을 말함
+
+		if (!email.match(regEx)) {
+			errors.email = 'Email must be a valid email address';
+		}
+	}
+
+	// TODO : validate password
+	if (password === '') {
+		errors.password = 'Password must not be empty';
+	} else if (password !== confirmPassword) {
+		errors.confirmPassword = 'Password must match';
+	}
+
+	return {
+		errors,
+		valid: Object.keys(errors).length < 1,
+	};
+};
+```
+
+```js
+// graphql/resolvers/users.js
+const { validateRegisterInput } = require('../../util/validators');
+
+const { valid, errors } = validateRegisterInput(
+	username,
+	email,
+	password,
+	confirmPassword
+);
+
+//* valid: Object.keys(errors).length < 1 ==> error 유무판단, 없으면 true
+if (!valid) {
+	throw new UserInputError('Errors', { errors });
+}
+```
+
+## Authentication(인증) / Authorization(허가)
+
+- context 레벨에 담겨있는 허가내용과 user의 token을 비교하여 사용자 인증
 
 ## error
