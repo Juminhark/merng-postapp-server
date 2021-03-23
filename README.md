@@ -4,7 +4,7 @@
 
 - [Classsed - GraphQL Server Series(MERNG)](https://www.youtube.com/watch?v=YBydg_Ui02Q&list=PLMhAeHCz8S3_CTiWMQhL6YxX7vZ7z84Zo)
 
-## Stack && Dependencies
+## Stack
 
 - [MongoDB](https://www.mongodb.com/cloud/atlas)
   - [mongoose](https://github.com/Automattic/mongoose)
