@@ -378,18 +378,8 @@ const server = new ApolloServer({
 ### Deployment
 
 - [heroku](https://devcenter.heroku.com/articles/heroku-cli)
-
-```sh
-> npm install -g heroku
-
-> heroku --version
-
-> heroku login
-
-> cd [server]
-
-> heroku create
-```
+  - github repository 연결하고 deploy
+  - postman 으로 서버에 연결확인
 
 ## keyword
 
