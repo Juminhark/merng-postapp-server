@@ -1,5 +1,21 @@
 # merng-postapp-server-GraphQL API
 
+- [https://merng-postapp-server.herokuapp.com/](https://merng-postapp-server.herokuapp.com/)
+- [postman](https://web.postman.co/home)
+
+```
+// post :  https://merng-postapp-server.herokuapp.com/
+// body : graphql
+{
+ getPosts{
+  id
+  body
+  createAt
+ }
+}
+send
+```
+
 ## Reference
 
 - [Classsed - GraphQL Server Series(MERNG)](https://www.youtube.com/watch?v=YBydg_Ui02Q&list=PLMhAeHCz8S3_CTiWMQhL6YxX7vZ7z84Zo)
