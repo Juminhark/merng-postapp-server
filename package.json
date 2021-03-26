@@ -5,7 +5,10 @@
 	"scripts": {
 		"start": "nodemon index.js"
 	},
-	"repository": "https://github.com/Juminhark/merng-postapp-server.git",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Juminhark/merng-postapp-server.git"
+	},
 	"author": "Ju minhark <wnalsgkr@gmail.com>",
 	"license": "MIT",
 	"dependencies": {
@@ -17,5 +20,10 @@
 	},
 	"devDependencies": {
 		"nodemon": "^2.0.7"
-	}
+	},
+	"description": "GraphQL Server Series",
+	"bugs": {
+		"url": "https://github.com/Juminhark/merng-postapp-server/issues"
+	},
+	"homepage": "https://github.com/Juminhark/merng-postapp-server#readme"
 }
